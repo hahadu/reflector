@@ -1,26 +1,21 @@
 <?php
-/**
- * phpDocumentor
- *
- * PHP Version 7.3
- *
- */
 
 namespace Hahadu\Reflector;
 
-use Hahadu\Reflector\Reflection\{Tag,Context,Location};
-
+use Reflector;
+use Hahadu\Reflector\Reflection\{Tag,Context,Location,Description};
+use LogicException;
 /**
  * 解析Reflector结构.
  *
  */
-class Reflection implements \Reflector
+class Reflection implements Reflector
 {
     /** @var string The opening line for this docblock. */
     protected $short_description = '';
 
     /**
-     * @var Reflection\Description The actual
+     * @var Description The actual
      *     description for this docblock.
      */
     protected $long_description = null;
@@ -29,15 +24,15 @@ class Reflection implements \Reflector
      * @var Tag[] An array containing all
      *     the tags in this docblock; except inline.
      */
-    protected $tags = array();
+    protected $tags = [];
 
-    /** @var Context Information about the context of this Reflection. */
+    /** @var Context Reflection上下文的信息. */
     protected $context = null;
 
-    /** @var Location Information about the location of this Reflection. */
+    /** @var Location 反射的位置信息. */
     protected $location = null;
 
-    /** @var bool Is this Reflection (the start of) a template? */
+    /** @var bool 如果这个反射(开始)是一个模板 */
     protected $isTemplateStart = false;
 
     /** @var bool Does this Reflection signify the end of a Reflection template? */
@@ -48,17 +43,13 @@ class Reflection implements \Reflector
      *
      * 构造函数也可以接收命名空间信息，例如
      * 当前命名空间和别名。这个信息被一些标签使用
-     *      (e.g. @param \Reflector|string $docblock A docblock comment (including
+     *      (e.g.
+     * @param Reflector|string $docblock A docblock comment (including
      *     asterisks) or reflector supporting the getDocComment method.
-     * @param Context           $context  The context in which the Reflection
+     * @param Context|null $context The context in which the Reflection
      *     occurs.
-     * @param Location          $location The location within the file that this
+     * @param Location|null $location The location within the file that this
      *     Reflection occurs in.
-     *
-     * @return, @param, etc.) to turn a relative Type into a FQCN.
-     *
-     * @throws \InvalidArgumentException if the given argument does not have the
-     *     getDocComment method.
      */
     public function __construct(
         $docblock,
@@ -66,12 +57,10 @@ class Reflection implements \Reflector
         Location $location = null
     ) {
         if (is_object($docblock)) {
-            if (!method_exists($docblock, 'getDocComment')) {
-                throw new \InvalidArgumentException(
-                    'Invalid object passed; the given reflector must support '
-                    . 'the getDocComment method'
-                );
-            }
+            throw_if(!method_exists($docblock, 'getDocComment'),
+                \InvalidArgumentException::class,
+                '传递的对象无效:给定的Reflection必须支持getDocComment方法'
+            );
 
             $docblock = $docblock->getDocComment();
         }
@@ -82,7 +71,7 @@ class Reflection implements \Reflector
         $this->isTemplateStart = $templateMarker === '#@+';
         $this->isTemplateEnd = $templateMarker === '#@-';
         $this->short_description = $short;
-        $this->long_description = new Reflection\Description($long, $this);
+        $this->long_description = new Description($long, $this);
         $this->parseTags($tags);
 
 
@@ -113,44 +102,40 @@ class Reflection implements \Reflector
         }
 
         // normalize strings
-        $comment = str_replace(array("\r\n", "\r"), "\n", $comment);
+        $comment = str_replace(["\r\n", "\r"], "\n", $comment);
 
         return $comment;
     }
 
     /**
-     * Splits the Reflection into a template marker, summary, description and block of tags.
+     * 将反射信息分割为模板标记、摘要、描述和标记块。
      *
-     * @param string $comment Comment to split into the sub-parts.
+     * @param string $comment 拆分注释.
      *
      * @author Richard van Velzen (@_richardJ) Special thanks to Richard for the regex responsible for the split.
      * @author Mike van Riel <me@mikevanriel.com> for extending the regex with template marker support.
      *
-     * @return string[] containing the template marker (if any), summary, description and a string containing the tags.
+     * @return string[] 包含模板标记(如果有的话)、摘要、描述和包含标记的字符串。
      */
     protected function splitDocBlock($comment)
     {
-        // Performance improvement cheat: if the first character is an @ then only tags are in this Reflection. This
-        // method does not split tags so we return this verbatim as the fourth result (tags). This saves us the
-        // performance impact of running a regular expression
+        // 提高性能的技巧:如果第一个字符是@，那么这个Reflection中只有标记。
+        // 此方法不分割标签，因此我们将其作为第四个结果(标签)返回。
+        // 节省了运行正则表达式对性能的影响
         if (strpos($comment, '@') === 0) {
-            return array('', '', '', $comment);
+            return ['', '', '', $comment];
         }
 
-        // clears all extra horizontal whitespace from the line endings to prevent parsing issues
+        // ：从行结束处清除所有额外的水平空格以防止解析问题
         $comment = preg_replace('/\h*$/Sum', '', $comment);
 
         /*
-         * Splits the docblock into a template marker, short description, long description and tags section
+         * 将文档块分割为模板标记、短描述、长描述和标记部分
          *
-         * - The template marker is empty, #@+ or #@- if the Reflection starts with either of those (a newline may
-         *   occur after it and will be stripped).
-         * - The short description is started from the first character until a dot is encountered followed by a
-         *   newline OR two consecutive newlines (horizontal whitespace is taken into account to consider spacing
-         *   errors). This is optional.
-         * - The long description, any character until a new line is encountered followed by an @ and word
-         *   characters (a tag). This is optional.
-         * - Tags; the remaining characters
+         * - 模板标记是空的，#@+或#@-如果反射以这两个标记中的任何一个开始(它后面可能出现换行符，并将被剥离)
+         * - 简短的描述从第一个字符开始，直到遇到一个点，后跟一个换行符或两个连续的换行符(考虑空格错误时考虑水平空格)。可选
+         * - 长描述，任何字符，直到遇到一个新行，后跟一个@和单词字符(标签)。可选
+         * - 标签、剩余的字符
          *
          * Big thanks to RichardJ for contributing this Regular Expression
          */
@@ -203,23 +188,21 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Creates the tag objects.
+     * 创建标记对象。
      *
      * @param string $tags Tag block to parse.
      *
      * @return void
+     * @throw LogicException
      */
     protected function parseTags($tags)
     {
-        $result = array();
+        $result = [];
         $tags = trim($tags);
         if ('' !== $tags) {
-            if ('@' !== $tags[0]) {
-                throw new \LogicException(
-                    'A tag block started with text instead of an actual tag,'
-                    . ' this makes the tag block invalid: ' . $tags
-                );
-            }
+
+            throw_if('@' !== $tags[0],LogicException::class,
+                'tag block无效,tag block 以文本而不是实际标记开始：' . $tags);
             foreach (explode("\n", $tags) as $tag_line) {
                 if (isset($tag_line[0]) && ($tag_line[0] === '@')) {
                     $result[] = $tag_line;
@@ -238,12 +221,11 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Gets the text portion of the doc block.
+     * 获取文档块的文本部分。
      *
-     * Gets the text portion (short and long description combined) of the doc
-     * block.
+     * 获取文档块的文本部分(短描述和长描述组合)。
      *
-     * @return string The text portion of the doc block.
+     * @return string 文档块的文本部分。
      */
     public function getText()
     {
@@ -258,20 +240,19 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Set the text portion of the doc block.
+     * 设置文档块的文本部分。
      *
-     * Sets the text portion (short and long description combined) of the doc
-     * block.
+     * 设置文档块的文本部分(短描述和长描述的组合)。
      *
-     * @param string $docblock The new text portion of the doc block.
+     * @param string $comment 文档块的新文本部分
      *
      * @return $this This doc block.
      */
-    public function setText($comment)
+    public function setText(string $comment)
     {
         list(,$short, $long) = $this->splitDocBlock($comment);
         $this->short_description = $short;
-        $this->long_description = new Reflection\Description($long, $this);
+        $this->long_description = new Description($long, $this);
         return $this;
     }
     /**
@@ -287,7 +268,7 @@ class Reflection implements \Reflector
     /**
      * Returns the full description or also known as long description.
      *
-     * @return Reflection\Description
+     * @return Description
      */
     public function getLongDescription()
     {
@@ -295,12 +276,12 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns whether this Reflection is the start of a Template section.
+     * 返回此反射是否为模板节的开始。
      *
-     * A Docblock may serve as template for a series of subsequent DocBlocks. This is indicated by a special marker
-     * (`#@+`) that is appended directly after the opening `/**` of a Reflection.
+     *Docblock可以用作一系列后续Docblock的模板。这由一个特殊的标记表示
+     *（`#@+`），直接附加在反射的开头`/**`之后。
      *
-     * An example of such an opening is:
+     * 一个简单的例子：
      *
      * ```
      * /**#@+
@@ -308,12 +289,11 @@ class Reflection implements \Reflector
      *  * /
      * ```
      *
-     * The description and tags (not the summary!) are copied onto all subsequent DocBlocks and also applied to all
-     * elements that follow until another Reflection is found that contains the closing marker (`#@-`).
-     *
-     * @see self::isTemplateEnd() for the check whether a closing marker was provided.
+     *说明和标记（不是摘要！）复制到所有后续DocBlock上，并应用于所有DocBlock元素，直到找到另一个包含结束标记（`#@-`）的反射。
      *
      * @return boolean
+     * @see $this::isTemplateEnd() 用于检查是否提供了关闭标记。
+     *
      */
     public function isTemplateStart()
     {
@@ -321,9 +301,9 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns whether this Reflection is the end of a Template section.
+     * 返回该反射是否为模板部分的结束
      *
-     * @see self::isTemplateStart() for a more complete description of the Docblock Template functionality.
+     * @see self::isTemplateStart() 有关模板功能的更完整说明。
      *
      * @return boolean
      */
@@ -333,7 +313,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns the current context.
+     * 当前上下文.
      *
      * @return Context
      */
@@ -343,7 +323,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns the current location.
+     * 当前位置.
      *
      * @return Location
      */
@@ -353,7 +333,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns the tags for this Reflection.
+     * 当前反射标记.
      *
      * @return Tag[]
      */
@@ -363,8 +343,9 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns an array of tags matching the given name. If no tags are found
-     * an empty array is returned.
+     * 返回与给定名称匹配的标记数组。
+     *
+     * 如果未找到标记，则返回空数组。
      *
      * @param string $name String to search by.
      *
@@ -372,7 +353,7 @@ class Reflection implements \Reflector
      */
     public function getTagsByName($name)
     {
-        $result = array();
+        $result = [];
 
         /** @var Tag $tag */
         foreach ($this->getTags() as $tag) {
@@ -406,7 +387,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Appends a tag at the end of the list of tags.
+     * 在标记列表的末尾添加标记。
      *
      * @param Tag $tag The tag to add.
      *
@@ -419,6 +400,7 @@ class Reflection implements \Reflector
         if (null === $tag->getDocBlock()) {
             $tag->setDocBlock($this);
         }
+
 
         if ($tag->getDocBlock() === $this) {
             $this->tags[] = $tag;

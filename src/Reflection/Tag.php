@@ -1,25 +1,12 @@
 <?php
-/**
- * phpDocumentor
- *
- * PHP Version 5.3
- *
- * @author    Mike van Riel <mike.vanriel@naenius.com>
- * @copyright 2010-2011 Mike van Riel / Naenius (http://www.naenius.com)
- * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      http://phpdoc.org
- */
 
 namespace Hahadu\Reflector\Reflection;
 
 use Hahadu\Reflector\Reflection;
-
+use Hahadu\Reflector\Reflection\Tag\{AuthorTag,CoversTag,DeprecatedTag};
 /**
  * Parses a tag definition for a Reflection.
  *
- * @author  Mike van Riel <mike.vanriel@naenius.com>
- * @license http://www.opensource.org/licenses/mit-license.php MIT
- * @link    http://phpdoc.org
  */
 class Tag implements \Reflector
 {
@@ -57,60 +44,39 @@ class Tag implements \Reflector
      *     handles it as an array value. The class is expected to inherit this
      *     class.
      */
-    private static $tagHandlerMappings = array(
-        'author'
-            => '\Mpociot\Reflection\DocBlock\Tag\AuthorTag',
-        'covers'
-            => '\Mpociot\Reflection\DocBlock\Tag\CoversTag',
-        'deprecated'
-            => '\Mpociot\Reflection\DocBlock\Tag\DeprecatedTag',
-        'example'
-            => '\Mpociot\Reflection\DocBlock\Tag\ExampleTag',
-        'link'
-            => '\Mpociot\Reflection\DocBlock\Tag\LinkTag',
-        'method'
-            => '\Mpociot\Reflection\DocBlock\Tag\MethodTag',
-        'param'
-            => '\Mpociot\Reflection\DocBlock\Tag\ParamTag',
-        'property-read'
-            => '\Mpociot\Reflection\DocBlock\Tag\PropertyReadTag',
-        'property'
-            => '\Mpociot\Reflection\DocBlock\Tag\PropertyTag',
-        'property-write'
-            => '\Mpociot\Reflection\DocBlock\Tag\PropertyWriteTag',
-        'return'
-            => '\Mpociot\Reflection\DocBlock\Tag\ReturnTag',
-        'see'
-            => '\Mpociot\Reflection\DocBlock\Tag\SeeTag',
-        'since'
-            => '\Mpociot\Reflection\DocBlock\Tag\SinceTag',
-        'source'
-            => '\Mpociot\Reflection\DocBlock\Tag\SourceTag',
-        'throw'
-            => '\Mpociot\Reflection\DocBlock\Tag\ThrowsTag',
-        'throws'
-            => '\Mpociot\Reflection\DocBlock\Tag\ThrowsTag',
-        'uses'
-            => '\Mpociot\Reflection\DocBlock\Tag\UsesTag',
-        'var'
-            => '\Mpociot\Reflection\DocBlock\Tag\VarTag',
-        'version'
-            => '\Mpociot\Reflection\DocBlock\Tag\VersionTag'
-    );
+    private static $tagHandlerMappings = [
+        'author' => AuthorTag::class,
+        'covers' => CoversTag::class,
+        'deprecated' => DeprecatedTag::class,
+        'example' => Tag\ExampleTag::class,
+        'link' => Tag\LinkTag::class,
+        'method' => Tag\MethodTag::class,
+        'param' => Tag\ParamTag::class,
+        'property-read' => Tag\PropertyReadTag::class,
+        'property' => Tag\PropertyTag::class,
+        'property-write' => Tag\PropertyWriteTag::class,
+        'return' => Tag\ReturnTag::class,
+        'see' => Tag\SeeTag::class,
+        'since' => Tag\SinceTag::class,
+        'source' => Tag\SourceTag::class,
+        'throw' => Tag\ThrowsTag::class,
+        'throws' => Tag\ThrowsTag::class,
+        'uses' => Tag\UsesTag::class,
+        'var' => Tag\VarTag::class,
+        'version' => Tag\VersionTag::class,
+    ];
 
     /**
      * Factory method responsible for instantiating the correct sub type.
      *
-     * @param string   $tag_line The text for this tag, including description.
-     * @param Reflection $docblock The Reflection which this tag belongs to.
-     * @param Location $location Location of the tag.
+     * @param string $tag_line The text for this tag, including description.
+     * @param Reflection|null $docblock The Reflection which this tag belongs to.
+     * @param Location|null $location Location of the tag.
      *
      * @return static A new tag object.
-     *@throws \InvalidArgumentException if an invalid tag line was presented.
-     *
      */
     final public static function createInstance(
-                   $tag_line,
+        string     $tag_line,
         Reflection $docblock = null,
         Location   $location = null
     ) {
@@ -140,7 +106,7 @@ class Tag implements \Reflector
 
         return new $handler(
             $matches[1],
-            isset($matches[2]) ? $matches[2] : '',
+            $matches[2] ?? '',
             $docblock,
             $location
         );
@@ -184,17 +150,18 @@ class Tag implements \Reflector
     /**
      * Parses a tag and populates the member variables.
      *
-     * @param string   $name     Name of the tag.
-     * @param string   $content  The contents of the given tag.
-     * @param Reflection $docblock The Reflection which this tag belongs to.
-     * @param Location $location Location of the tag.
+     * @param string $name Name of the tag.
+     * @param string $content The contents of the given tag.
+     * @param Reflection|null $docblock The Reflection which this tag belongs to.
+     * @param Location|null $location Location of the tag.
      */
     public function __construct(
-                   $name,
-                   $content,
+        string     $name,
+        string     $content,
         Reflection $docblock = null,
         Location   $location = null
-    ) {
+    )
+    {
         $this
             ->setName($name)
             ->setContent($content)
@@ -207,7 +174,7 @@ class Tag implements \Reflector
      *
      * @return string The name of this tag.
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->tag;
     }
@@ -220,7 +187,7 @@ class Tag implements \Reflector
      * @return $this
      * @throws \InvalidArgumentException When an invalid tag name is provided.
      */
-    public function setName($name)
+    public function setName(string $name): Tag
     {
         if (!preg_match('/^' . self::REGEX_TAGNAME . '$/u', $name)) {
             throw new \InvalidArgumentException(

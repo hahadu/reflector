@@ -1,14 +1,4 @@
 <?php
-/**
- * phpDocumentor
- *
- * PHP Version 5.3
- *
- * @author    Barry vd. Heuvel <barryvdh@gmail.com>
- * @copyright 2013 Mike van Riel / Naenius (http://www.naenius.com)
- * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      http://phpdoc.org
- */
 
 namespace Hahadu\Reflector\Reflection;
 
