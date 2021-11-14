@@ -15,7 +15,7 @@ namespace Hahadu\Reflector\Reflection;
 use Hahadu\Reflector\Reflection;
 
 /**
- * Parses a tag definition for a DocBlock.
+ * Parses a tag definition for a Reflection.
  *
  * @author  Mike van Riel <mike.vanriel@naenius.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT
@@ -49,7 +49,7 @@ class Tag implements \Reflector
     /** @var Location Location of the tag. */
     protected $location = null;
 
-    /** @var DocBlock The DocBlock which this tag belongs to. */
+    /** @var Reflection The Reflection which this tag belongs to. */
     protected $docblock = null;
 
     /**
@@ -102,17 +102,17 @@ class Tag implements \Reflector
      * Factory method responsible for instantiating the correct sub type.
      *
      * @param string   $tag_line The text for this tag, including description.
-     * @param DocBlock $docblock The DocBlock which this tag belongs to.
+     * @param Reflection $docblock The Reflection which this tag belongs to.
      * @param Location $location Location of the tag.
      *
-     * @throws \InvalidArgumentException if an invalid tag line was presented.
-     *
      * @return static A new tag object.
+     *@throws \InvalidArgumentException if an invalid tag line was presented.
+     *
      */
     final public static function createInstance(
-        $tag_line,
-        DocBlock $docblock = null,
-        Location $location = null
+                   $tag_line,
+        Reflection $docblock = null,
+        Location   $location = null
     ) {
         if (!preg_match(
             '/^@(' . self::REGEX_TAGNAME . ')(?:\s*([^\s].*)|$)?/us',
@@ -186,14 +186,14 @@ class Tag implements \Reflector
      *
      * @param string   $name     Name of the tag.
      * @param string   $content  The contents of the given tag.
-     * @param DocBlock $docblock The DocBlock which this tag belongs to.
+     * @param Reflection $docblock The Reflection which this tag belongs to.
      * @param Location $location Location of the tag.
      */
     public function __construct(
-        $name,
-        $content,
-        DocBlock $docblock = null,
-        Location $location = null
+                   $name,
+                   $content,
+        Reflection $docblock = null,
+        Location   $location = null
     ) {
         $this
             ->setName($name)
@@ -306,7 +306,7 @@ class Tag implements \Reflector
     /**
      * Gets the docblock this tag belongs to.
      *
-     * @return DocBlock The docblock this tag belongs to.
+     * @return Reflection The docblock this tag belongs to.
      */
     public function getDocBlock()
     {
@@ -316,12 +316,12 @@ class Tag implements \Reflector
     /**
      * Sets the docblock this tag belongs to.
      *
-     * @param DocBlock $docblock The new docblock this tag belongs to. Setting
+     * @param Reflection $docblock The new docblock this tag belongs to. Setting
      *     NULL removes any association.
      *
      * @return $this
      */
-    public function setDocBlock(DocBlock $docblock = null)
+    public function setDocBlock(Reflection $docblock = null)
     {
         $this->docblock = $docblock;
 

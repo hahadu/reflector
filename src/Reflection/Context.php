@@ -13,7 +13,7 @@
 namespace Hahadu\Reflector\Reflection;
 
 /**
- * The context in which a DocBlock occurs.
+ * The context in which a Reflection occurs.
  *
  * @author  Vasil Rangelov <boen.robot@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT
@@ -32,7 +32,7 @@ class Context
 
     /**
      * Cteates a new context.
-     * @param string $namespace         The namespace where this DocBlock
+     * @param string $namespace         The namespace where this Reflection
      *     resides in.
      * @param array  $namespace_aliases List of namespace aliases => Fully
      *     Qualified Namespace.
@@ -52,7 +52,7 @@ class Context
     }
 
     /**
-     * @return string The namespace where this DocBlock resides in.
+     * @return string The namespace where this Reflection resides in.
      */
     public function getNamespace()
     {

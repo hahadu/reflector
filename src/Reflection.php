@@ -31,16 +31,16 @@ class Reflection implements \Reflector
      */
     protected $tags = array();
 
-    /** @var Context Information about the context of this DocBlock. */
+    /** @var Context Information about the context of this Reflection. */
     protected $context = null;
 
-    /** @var Location Information about the location of this DocBlock. */
+    /** @var Location Information about the location of this Reflection. */
     protected $location = null;
 
-    /** @var bool Is this DocBlock (the start of) a template? */
+    /** @var bool Is this Reflection (the start of) a template? */
     protected $isTemplateStart = false;
 
-    /** @var bool Does this DocBlock signify the end of a DocBlock template? */
+    /** @var bool Does this Reflection signify the end of a Reflection template? */
     protected $isTemplateEnd = false;
 
     /**
@@ -50,10 +50,10 @@ class Reflection implements \Reflector
      * 当前命名空间和别名。这个信息被一些标签使用
      *      (e.g. @param \Reflector|string $docblock A docblock comment (including
      *     asterisks) or reflector supporting the getDocComment method.
-     * @param Context           $context  The context in which the DocBlock
+     * @param Context           $context  The context in which the Reflection
      *     occurs.
      * @param Location          $location The location within the file that this
-     *     DocBlock occurs in.
+     *     Reflection occurs in.
      *
      * @return, @param, etc.) to turn a relative Type into a FQCN.
      *
@@ -119,7 +119,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Splits the DocBlock into a template marker, summary, description and block of tags.
+     * Splits the Reflection into a template marker, summary, description and block of tags.
      *
      * @param string $comment Comment to split into the sub-parts.
      *
@@ -130,7 +130,7 @@ class Reflection implements \Reflector
      */
     protected function splitDocBlock($comment)
     {
-        // Performance improvement cheat: if the first character is an @ then only tags are in this DocBlock. This
+        // Performance improvement cheat: if the first character is an @ then only tags are in this Reflection. This
         // method does not split tags so we return this verbatim as the fourth result (tags). This saves us the
         // performance impact of running a regular expression
         if (strpos($comment, '@') === 0) {
@@ -143,7 +143,7 @@ class Reflection implements \Reflector
         /*
          * Splits the docblock into a template marker, short description, long description and tags section
          *
-         * - The template marker is empty, #@+ or #@- if the DocBlock starts with either of those (a newline may
+         * - The template marker is empty, #@+ or #@- if the Reflection starts with either of those (a newline may
          *   occur after it and will be stripped).
          * - The short description is started from the first character until a dot is encountered followed by a
          *   newline OR two consecutive newlines (horizontal whitespace is taken into account to consider spacing
@@ -295,21 +295,21 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns whether this DocBlock is the start of a Template section.
+     * Returns whether this Reflection is the start of a Template section.
      *
      * A Docblock may serve as template for a series of subsequent DocBlocks. This is indicated by a special marker
-     * (`#@+`) that is appended directly after the opening `/**` of a DocBlock.
+     * (`#@+`) that is appended directly after the opening `/**` of a Reflection.
      *
      * An example of such an opening is:
      *
      * ```
      * /**#@+
-     *  * My DocBlock
+     *  * My Reflection
      *  * /
      * ```
      *
      * The description and tags (not the summary!) are copied onto all subsequent DocBlocks and also applied to all
-     * elements that follow until another DocBlock is found that contains the closing marker (`#@-`).
+     * elements that follow until another Reflection is found that contains the closing marker (`#@-`).
      *
      * @see self::isTemplateEnd() for the check whether a closing marker was provided.
      *
@@ -321,7 +321,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns whether this DocBlock is the end of a Template section.
+     * Returns whether this Reflection is the end of a Template section.
      *
      * @see self::isTemplateStart() for a more complete description of the Docblock Template functionality.
      *
@@ -353,7 +353,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Returns the tags for this DocBlock.
+     * Returns the tags for this Reflection.
      *
      * @return Tag[]
      */
@@ -387,7 +387,7 @@ class Reflection implements \Reflector
     }
 
     /**
-     * Checks if a tag of a certain type is present in this DocBlock.
+     * Checks if a tag of a certain type is present in this Reflection.
      *
      * @param string $name Tag name to check for.
      *
@@ -412,7 +412,7 @@ class Reflection implements \Reflector
      *
      * @return Tag The newly added tag.
      *
-     * @throws \LogicException When the tag belongs to a different DocBlock.
+     * @throws \LogicException When the tag belongs to a different Reflection.
      */
     public function appendTag(Tag $tag)
     {
@@ -424,7 +424,7 @@ class Reflection implements \Reflector
             $this->tags[] = $tag;
         } else {
             throw new \LogicException(
-                'This tag belongs to a different DocBlock object.'
+                'This tag belongs to a different Reflection object.'
             );
         }
 

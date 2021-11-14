@@ -15,7 +15,7 @@ namespace Hahadu\Reflector\Reflection;
 use Hahadu\Reflector\Reflection;
 
 /**
- * Parses a Description of a DocBlock or tag.
+ * Parses a Description of a Reflection or tag.
  *
  * @author  Mike van Riel <mike.vanriel@naenius.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT
@@ -29,16 +29,16 @@ class Description implements \Reflector
     /** @var array The contents, as an array of strings and Tag objects. */
     protected $parsedContents = null;
 
-    /** @var DocBlock The DocBlock which this description belongs to. */
+    /** @var Reflection The Reflection which this description belongs to. */
     protected $docblock = null;
 
     /**
      * Populates the fields of a description.
      *
      * @param string   $content  The description's conetnts.
-     * @param DocBlock $docblock The DocBlock which this description belongs to.
+     * @param Reflection $docblock The Reflection which this description belongs to.
      */
-    public function __construct($content, DocBlock $docblock = null)
+    public function __construct($content, Reflection $docblock = null)
     {
         $this->setContent($content)->setDocBlock($docblock);
     }
@@ -175,7 +175,7 @@ class Description implements \Reflector
     /**
      * Gets the docblock this tag belongs to.
      *
-     * @return DocBlock The docblock this description belongs to.
+     * @return Reflection The docblock this description belongs to.
      */
     public function getDocBlock()
     {
@@ -185,12 +185,12 @@ class Description implements \Reflector
     /**
      * Sets the docblock this tag belongs to.
      *
-     * @param DocBlock $docblock The new docblock this description belongs to.
+     * @param Reflection $docblock The new docblock this description belongs to.
      *     Setting NULL removes any association.
      *
      * @return $this
      */
-    public function setDocBlock(DocBlock $docblock = null)
+    public function setDocBlock(Reflection $docblock = null)
     {
         $this->docblock = $docblock;
 

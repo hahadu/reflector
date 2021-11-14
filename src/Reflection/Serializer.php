@@ -15,7 +15,7 @@ namespace Hahadu\Reflector\Reflection;
 use Hahadu\Reflector\Reflection;
 
 /**
- * Serializes a DocBlock instance.
+ * Serializes a Reflection instance.
  *
  * @author  Barry vd. Heuvel <barryvdh@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT
@@ -159,13 +159,13 @@ class Serializer
     }
 
     /**
-     * Generate a DocBlock comment.
+     * Generate a Reflection comment.
      *
-     * @param DocBlock The DocBlock to serialize.
+     * @param Reflection The Reflection to serialize.
      *
      * @return string The serialized doc block.
      */
-    public function getDocComment(DocBlock $docblock)
+    public function getDocComment(Reflection $docblock)
     {
         $indent = str_repeat($this->indentString, $this->indent);
         $firstIndent = $this->isFirstLineIndented ? $indent : '';

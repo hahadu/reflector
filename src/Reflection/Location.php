@@ -13,7 +13,7 @@
 namespace Hahadu\Reflector\Reflection;
 
 /**
- * The location a DocBlock occurs within a file.
+ * The location a Reflection occurs within a file.
  *
  * @author  Vasil Rangelov <boen.robot@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.php MIT
@@ -21,10 +21,10 @@ namespace Hahadu\Reflector\Reflection;
  */
 class Location
 {
-    /** @var int Line where the DocBlock text starts. */
+    /** @var int Line where the Reflection text starts. */
     protected $lineNumber = 0;
 
-    /** @var int Column where the DocBlock text starts. */
+    /** @var int Column where the Reflection text starts. */
     protected $columnNumber = 0;
 
     public function __construct(
@@ -35,7 +35,7 @@ class Location
     }
 
     /**
-     * @return int Line where the DocBlock text starts.
+     * @return int Line where the Reflection text starts.
      */
     public function getLineNumber()
     {
@@ -55,7 +55,7 @@ class Location
     }
 
     /**
-     * @return int Column where the DocBlock text starts.
+     * @return int Column where the Reflection text starts.
      */
     public function getColumnNumber()
     {
