@@ -14,7 +14,6 @@ namespace Hahadu\Reflector\Reflection;
 
 use Hahadu\Reflector\Reflection;
 use Parsedown;
-use Michelf\Markdown;
 
 /**
  * Parses a Description of a Reflection or tag.
@@ -162,16 +161,8 @@ class Description implements \Reflector
                 $result
             );
         }
-
-        if (class_exists('Parsedown')) {
-            $markdown = Parsedown::instance();
-            $result = $markdown->parse($result);
-        } elseif (class_exists(Markdown::class)) {
-            $markdown = new Markdown();
-            $markdown->transform();
-            //$markdown = new \dflydev\markdown\MarkdownExtraParser();
-            $result = $markdown->transformMarkdown($result);
-        }
+        $markdown = Parsedown::instance();
+        $result = $markdown->parse($result);
 
         return trim($result);
     }

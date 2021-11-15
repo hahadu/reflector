@@ -1,48 +1,34 @@
 <?php
-/**
- * phpDocumentor
- *
- * PHP Version 5.3
- *
- * @author    Vasil Rangelov <boen.robot@gmail.com>
- * @copyright 2010-2011 Mike van Riel / Naenius (http://www.naenius.com)
- * @license   http://www.opensource.org/licenses/mit-license.php MIT
- * @link      http://phpdoc.org
- */
 
 namespace Hahadu\Reflector\Reflection;
 
 /**
- * The context in which a Reflection occurs.
- *
- * @author  Vasil Rangelov <boen.robot@gmail.com>
- * @license http://www.opensource.org/licenses/mit-license.php MIT
- * @link    http://phpdoc.org
+ * 反射内容的上下文
  */
 class Context
 {
-    /** @var string The current namespace. */
+    /** @var string 当前 namespace. */
     protected $namespace = '';
 
-    /** @var array List of namespace aliases => Fully Qualified Namespace. */
-    protected $namespace_aliases = array();
+    /** @var array namespace 别名列表 => Fully Qualified Namespace. */
+    protected $namespace_aliases = [];
 
-    /** @var string Name of the structural element, within the namespace. */
+    /** @var string 名称空间中结构元素名称. */
     protected $lsen = '';
 
     /**
-     * Cteates a new context.
-     * @param string $namespace         The namespace where this Reflection
+     * 创建一个新的context.
+     * @param string $namespace         反射所在的namespace
      *     resides in.
-     * @param array  $namespace_aliases List of namespace aliases => Fully
+     * @param array  $namespace_aliases namespace 别名列表 => Fully
      *     Qualified Namespace.
      * @param string $lsen              Name of the structural element, within
      *     the namespace.
      */
     public function __construct(
-        $namespace = '',
-        array $namespace_aliases = array(),
-        $lsen = ''
+        string $namespace = '',
+        array  $namespace_aliases = [],
+        string $lsen = ''
     ) {
         if (!empty($namespace)) {
             $this->setNamespace($namespace);
@@ -52,9 +38,9 @@ class Context
     }
 
     /**
-     * @return string The namespace where this Reflection resides in.
+     * @return string Reflection 所属的 namespace
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         return $this->namespace;
     }
@@ -62,13 +48,13 @@ class Context
     /**
      * @return array List of namespace aliases => Fully Qualified Namespace.
      */
-    public function getNamespaceAliases()
+    public function getNamespaceAliases(): array
     {
         return $this->namespace_aliases;
     }
 
     /**
-     * Returns the Local Structural Element Name.
+     * 局部元素名称。.
      *
      * @return string Name of the structural element, within the namespace.
      */
@@ -78,11 +64,9 @@ class Context
     }
 
     /**
-     * Sets a new namespace.
-     *
-     * Sets a new namespace for the context. Leading and trailing slashes are
-     * trimmed, and the keywords "global" and "default" are treated as aliases
-     * to no namespace.
+     * 设置新的名称空间。
+    ＊
+     * 为上下文设置一个新的namespace。自动裁掉两端斜杠，关键字“global”和“default”被视为无namespace的别名
      *
      * @param string $namespace The new namespace to set.
      *
@@ -102,7 +86,7 @@ class Context
     }
 
     /**
-     * Sets the namespace aliases, replacing all previous ones.
+     * 设置namespace别名，替换前面的所有aliases
      *
      * @param array $namespace_aliases List of namespace aliases => Fully
      *     Qualified Namespace.
@@ -136,11 +120,9 @@ class Context
     }
 
     /**
-     * Sets a new Local Structural Element Name.
+     * 设置新的局部结构图元名称。
      *
-     * Sets a new Local Structural Element Name. A local name also contains
-     * punctuation determining the kind of structural element (e.g. trailing "("
-     * and ")" for functions and methods).
+     * 设置新的局部结构 element 。局部名称还包含确定结构元素类型的标点符号（例如，函数和方法的尾随“（“ and ”）”。
      *
      * @param string $lsen The new local name of a structural element.
      *
