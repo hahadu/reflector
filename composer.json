@@ -1,14 +1,16 @@
 {
-    "name":    "hahadu/reflector",
-    "type":    "library",
+    "name": "hahadu/reflector",
+    "type": "library",
     "license": "MIT",
     "authors": [
-        {"name": "Hahadu", "email": "582167246@qq.com"}
+        {
+            "name": "Hahadu",
+            "email": "582167246@qq.com"
+        }
     ],
     "require": {
-        "php": ">=7.4",
-        "erusev/parsedown": "^1.7",
-        "michelf/php-markdown": "^1.9"
+        "php": ">=7.2",
+        "erusev/parsedown": "^1.7"
     },
     "autoload": {
         "psr-4": {
