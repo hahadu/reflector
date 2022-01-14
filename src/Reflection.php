@@ -1,5 +1,7 @@
 <?php
-
+/**
+ *
+ */
 namespace Hahadu\Reflector;
 
 use Reflector;
@@ -202,7 +204,7 @@ class Reflection implements Reflector
         if ('' !== $tags) {
 
             throw_if('@' !== $tags[0],LogicException::class,
-                'tag block无效,tag block 以文本而不是实际标记开始：' . $tags);
+                'tag block无效,tag block 应该以文本而不是实际标记开始：' . $tags);
             foreach (explode("\n", $tags) as $tag_line) {
                 if (isset($tag_line[0]) && ($tag_line[0] === '@')) {
                     $result[] = $tag_line;
@@ -233,7 +235,11 @@ class Reflection implements Reflector
         $long = $this->getLongDescription()->getContents();
 
         if ($long) {
-            return "{$short}\n\n{$long}";
+            return $short.
+                PHP_EOL.
+                PHP_EOL.
+                $long;
+
         } else {
             return $short;
         }
